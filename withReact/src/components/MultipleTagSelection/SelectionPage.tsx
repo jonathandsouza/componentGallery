@@ -2,23 +2,29 @@ import { useState } from "react";
 import Tag from "./Tag";
 
 interface TagState {
-  tag: string[];
+  tag: Set<string>;
 }
 
 export default function SelectionPage() {
-  const [tags, setTags] = useState<TagState>({ tag: [] });
+  const [tags, setTags] = useState<TagState>({ tag: new Set() });
 
   const checkTag = (tagName: string) => {
-    return tags.tag.includes(tagName);
+    return tags.tag.has(tagName);
   };
 
   const selectTag = (tagName: string) => {
-    if (tags.tag.includes(tagName)) {
-      const updatedTags = tags.tag.filter((item) => item !== tagName);
-      setTags((prev) => ({ ...prev, tag: updatedTags }));
-    } else {
-      setTags((prev) => ({ ...prev, tag: [...prev.tag, tagName] }));
+
+    const tag = tags.tag;
+
+    if (tag.has(tagName)) {
+      tag.delete(tagName);
     }
+    else {
+      tag.add(tagName);
+    }
+
+    setTags({ tag: new Set(tag) });
+
   };
 
   console.log(tags.tag);
@@ -31,7 +37,7 @@ export default function SelectionPage() {
         <Tag tagName="GO" selectTag={selectTag} selected={checkTag("GO")} />
         <Tag tagName="C" selectTag={selectTag} selected={checkTag("C")} />
       </div>
-      <div className="gap-3 m-3">You have selected: {tags.tag.join(", ")}</div>
+      <div className="gap-3 m-3">You have selected: {Array.from(tags.tag).join(",")}</div>
     </div>
   );
 }
